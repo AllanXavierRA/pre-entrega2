@@ -1,4 +1,5 @@
 import { Schema, model } from "mongoose";
+import mongoosePaginate from "mongoose-paginate-v2"
 
 const ProductoSchema = Schema({
     title: {
@@ -26,6 +27,9 @@ const ProductoSchema = Schema({
         required: [true, 'EL stock es obligatorio']
     }
 })
+
+ProductoSchema.plugin(mongoosePaginate);
+
 
 
 export const Producto = model('Producto', ProductoSchema);

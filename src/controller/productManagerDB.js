@@ -1,5 +1,6 @@
 import { request, response } from "express";
 import mongoose from "mongoose";
+import mongoosePaginate from "mongoose-paginate-v2";
 import { Producto } from "../dao/model/producto.js";
 
 
@@ -20,15 +21,53 @@ const productPost = async( req=request, res=response ) => {
 }
 
 const productGet = async ( req=request, res=response) => {
-    const {limit} = req.query;
-    const  productos = await Producto.find()
-    .limit(Number(limit)||10)
+    const {page = 1, limit = 10, sort} = req.query;
+
+    let ascendente
+    if(sort === 'asc'){
+        ascendente = 1;
+    }else if(sort === 'desc'){
+        ascendente = -1;
+    }
+
+    const options = {
+        page: parseInt(page, 10),
+        limit: parseInt(limit, 10),
+        sort: {price: ascendente}
+    }
+
+
+    try {
+        const {totalPages, prevPage, nextPage, page, hasPrevPage, hasNextPage, prevLink, nextLink, docs } = await Producto.paginate({}, options)
+
+        res.json({
+
+            status: 'success',
+            payload: docs,
+            totalPages,
+            prevPage,
+            nextPage,
+            page,
+            hasPrevPage,
+            hasNextPage,
+            prevLink,
+            nextLink,
+                    
+        })
+
+    } catch (error) {
+        res.json({
+
+        
+        status:'error',
+        payload: [],
+        
+    })
+    }
     
 
-    console.log(productos);
-    res.json({
-        productos
-    })
+    
+    
 }
 
 
